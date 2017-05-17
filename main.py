@@ -1,4 +1,21 @@
 from pasta import Pasta
+import math
+
+
+def calc_entropy(p_pos, p_neg):
+    if p_pos == 0:
+        return -p_neg * math.log(p_neg, 2)
+    elif p_neg == 0:
+        return -p_pos * math.log(p_pos, 2)
+    else:
+        return -p_pos * math.log(p_pos, 2) - p_neg * math.log(p_neg, 2) 
+
+
+def calc_entropy_data(data: []):
+    p_pos = sum(data) / len(data)
+    p_neg = 1 - p_pos
+    return calc_entropy(p_pos, p_neg)
+
 
 def main():
     data = [
@@ -18,3 +35,7 @@ def main():
         Pasta("Penne with Bolognese", "red", True, False, False),
         Pasta("Spaghetti curbonara", "white", True, False, False)
     ]
+
+
+if __name__ == "__main__":
+    main()

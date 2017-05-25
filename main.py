@@ -40,7 +40,11 @@ def calc_info_gain(attribute_dict: {}):
     return total_entropy - weighted_entropy_sum
 
 
-def id3_pasta(data: [], attributes: [], depth: int) -> None:
+def id3_pasta(data:[], attributes: []) -> None:
+    id3_helper(data, attributes, 0)
+
+
+def id3_helper(data: [], attributes: [], depth: int) -> None:
     padding = depth * "\t"
 
     if len(attributes) == 0:
@@ -92,17 +96,17 @@ def main():
 
     # Question 1
     print("\nQuestion 1")
-    id3_pasta(data, attributes, 0)
+    id3_pasta(data, attributes)
 
     # Question 2
     print("\nQuestion 2")
-    id3_pasta(data + [extended_data[0]], attributes, 0)
+    id3_pasta(data + [extended_data[0]], attributes)
 
     # Question 3
     print("\nQuestion 3 A")
-    id3_pasta(data + [extended_data[1]], attributes, 0)
+    id3_pasta(data + [extended_data[1]], attributes)
     print("\nQuestion 3 B")
-    id3_pasta(data + extended_data, attributes, 0)
+    id3_pasta(data + extended_data, attributes)
 
 
 if __name__ == "__main__":

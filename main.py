@@ -41,9 +41,11 @@ def calc_info_gain(attribute_dict: {}):
 
 
 def id3_pasta(data: [], attributes: [], depth: int) -> None:
-    if len(attributes) == 0:
-        return
     padding = depth * "\t"
+
+    if len(attributes) == 0:
+        print(padding, "Cannot determine")
+        return
     best_attribute = attributes[0]
     best_attribute_data = split_data(best_attribute, data)
     best_info_gain = calc_info_gain(best_attribute_data)
@@ -57,12 +59,14 @@ def id3_pasta(data: [], attributes: [], depth: int) -> None:
             best_attribute_data = partioned_data
             best_info_gain = info_gain
     
-    print(padding, "Best Attr: {}".format(best_attribute))
+    print("{}Best Attr: {}".format(padding, best_attribute))
     for key, value in best_attribute_data.items():
-        print(padding, "Attribute Value: ", key)
+        attribute_value = "{}Attribute Value: {}".format(padding, key)
         if math.isclose(calc_entropy_pasta_data(value), 0):
-            print(padding, "Like? ", value[0].data["like"])
+            attribute_value += " -> {}".format("Like" if value[0].data["like"] else "Dislike")
+            print(attribute_value)
             continue
+        print(attribute_value)
         id3_pasta(value, [x for x in attributes if x != best_attribute], depth+1)
 
 
@@ -84,8 +88,21 @@ def main():
         Pasta("Penne with Bolognese", "red", True, False, False),
         Pasta("Spaghetti curbonara", "white", True, False, False)
     ]
+    attributes = ["sauce_color", "has_meat", "has_seafood"]
 
-    id3_pasta(data, ["sauce_color", "has_meat", "has_seafood"], 0)
+    # Question 1
+    print("\nQuestion 1")
+    id3_pasta(data, attributes, 0)
+
+    # Question 2
+    print("\nQuestion 2")
+    id3_pasta(data + [extended_data[0]], attributes, 0)
+
+    # Question 3
+    print("\nQuestion 3 A")
+    id3_pasta(data + [extended_data[1]], attributes, 0)
+    print("\nQuestion 3 B")
+    id3_pasta(data + extended_data, attributes, 0)
 
 
 if __name__ == "__main__":

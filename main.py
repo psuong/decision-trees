@@ -1,4 +1,4 @@
-from pasta import Pasta
+from pasta import Pasta, split_data
 import math
 
 
@@ -11,10 +11,59 @@ def calc_entropy(p_pos, p_neg):
         return -p_pos * math.log(p_pos, 2) - p_neg * math.log(p_neg, 2) 
 
 
-def calc_entropy_data(data: []):
+def calc_entropy_bool_data(data: []):
     p_pos = sum(data) / len(data)
     p_neg = 1 - p_pos
     return calc_entropy(p_pos, p_neg)
+
+
+def calc_entropy_pasta_data(data: []):
+    """
+    Takes in an array of Pasta objects.
+    """
+    bool_array = [pasta.data["like"] for pasta in data]
+    return calc_entropy_bool_data(bool_array)
+
+
+def calc_info_gain(attribute_dict: {}):
+    total_bool_arr = []
+    for key, value in attribute_dict.items():
+        bool_array = [pasta.data["like"] for pasta in value]
+        total_bool_arr.extend(bool_array)
+    total_num = len(total_bool_arr)
+    total_entropy = calc_entropy_bool_data(total_bool_arr)
+
+    weighted_entropy_sum = 0
+    for key, value in attribute_dict.items():
+        sub_tree_entropy = calc_entropy_pasta_data(value)
+        weighted_entropy_sum += sub_tree_entropy * (len(value) / total_num)
+    return total_entropy - weighted_entropy_sum
+
+
+def id3_pasta(data: [], attributes: [], depth: int) -> None:
+    if len(attributes) == 0:
+        return
+    padding = depth * "\t"
+    best_attribute = attributes[0]
+    best_attribute_data = split_data(best_attribute, data)
+    best_info_gain = calc_info_gain(best_attribute_data)
+
+    for attribute in attributes[1:]:
+        partioned_data = split_data(attribute, data)
+        info_gain = calc_info_gain(partioned_data)
+
+        if info_gain > best_info_gain:
+            best_attribute = attribute
+            best_attribute_data = partioned_data
+            best_info_gain = info_gain
+    
+    print(padding, "Best Attr: {}".format(best_attribute))
+    for key, value in best_attribute_data.items():
+        print(padding, "Attribute Value: ", key)
+        if math.isclose(calc_entropy_pasta_data(value), 0):
+            print(padding, "Like? ", value[0].data["like"])
+            continue
+        id3_pasta(value, [x for x in attributes if x != best_attribute], depth+1)
 
 
 def main():
@@ -35,7 +84,8 @@ def main():
         Pasta("Penne with Bolognese", "red", True, False, False),
         Pasta("Spaghetti curbonara", "white", True, False, False)
     ]
-    
+
+    id3_pasta(data, ["sauce_color", "has_meat", "has_seafood"], 0)
 
 
 if __name__ == "__main__":
